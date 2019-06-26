@@ -13,3 +13,6 @@ pg_user:
   address: 0.0.0.0/0
   method: md5
   password: toor
+
+email_from: test_app@kiyanov.ru
+email_to: aleksandr@kiyanov.ru

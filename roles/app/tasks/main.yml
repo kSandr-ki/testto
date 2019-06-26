@@ -30,3 +30,8 @@
   template:
     src: db.php.j2
     dest: "{{ app_dir }}/db.php"
+
+- name: Configure mail
+  template:
+    src: notify.php.j2
+    dest: "{{ app_dir }}/notify.php"

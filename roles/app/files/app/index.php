@@ -1,18 +1,7 @@
 <?php
 require 'flight/Flight.php';
 include './db.php' ;
-
-function notify($message){
-     $email_from='test_app@kiyanov.ru';
-     $email_to='aleksandr@kiyanov.ru';
-     $email_message=$message;
-     $email_subject="Blacklisted";
-
-     $headers = 'From: '.$email_from."\r\n".
-     'Reply-To: '.$email_from."\r\n" .
-     'X-Mailer: PHP/' . phpversion();
-      mail($email_to, $email_subject, $email_message, $headers); 
-}
+include './notify.php' ;
 
 function check(){ 
     $conn = openConn();
