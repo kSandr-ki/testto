@@ -1,0 +1,22 @@
+#!/bin/bash
+
+info(){
+echo   DB_MASTER: $(cat terraform.tfstate | jq -r '.resources | map(select(.name == "db_master"))  | .[] | .instances | .[] | .attributes | .public_dns')
+
+echo   DB_SLAVE: $(cat terraform.tfstate | jq -r '.resources | map(select(.name == "db_slave"))  | .[] | .instances | .[] | .attributes | .public_dns')
+
+echo   APP: $(cat terraform.tfstate | jq -r '.resources | map(select(.name == "app_wm"))  | .[] | .instances | .[] | .attributes | .public_dns')
+
+}
+
+DOCKER="docker run --rm -e AWS_ACCESS_KEY=$AWS_ACCESS_KEY -e AWS_SECRET_KEY=$AWS_SECRET_KEY -v `pwd`:/terraform aksandr/terraform_ansible:0.1"
+
+[[ "$1" == "--destroy" ]] && $DOCKER terraform destroy -auto-approve
+[[ "$1" == "--info" ]] && info
+
+if [[ "$1" == "--apply" ]] ; then
+   $DOCKER /bin/bash terra
+   info
+
+echo   APP_URL: http://$(cat terraform.tfstate | jq -r '.resources | map(select(.name == "app_wm"))  | .[] | .instances | .[] | .attributes | .public_dns')
+fi

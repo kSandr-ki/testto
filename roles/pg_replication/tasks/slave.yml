@@ -1,0 +1,45 @@
+---
+
+- name: Create a base backup
+  shell: "MASTER={{ pgrs_master }} {{ pgrs_slave_script }} --force"
+  become: true
+  become_user: postgres
+  register: base_backup
+  ignore_errors: true
+
+- name: Start Postgres service
+  service:
+    name: "{{ pgrs_service }}"
+    state: started
+  delegate_to: "{{ pgrs_master }}"
+  when: base_backup.failed
+
+- name: Create a base backup (retry)
+  shell: "MASTER={{ pgrs_master }} {{ pgrs_slave_script }} --force"
+  become: true
+  become_user: postgres
+  when: base_backup.failed
+
+- name: Apply recovery settings
+  ini_file:
+    path: "{{ pgrs_data_dir }}/recovery.conf"
+    section: null
+    option: "{{ item.key }}"
+    value: |-
+      {%  if item.value is sameas true %}
+      {{    'on' }}
+      {%- elif item.value is sameas false %}
+      {{    'off' }}
+      {%- elif item.value is string %}
+      {{    item.value | quote }}
+      {%- else %}
+      {{    item.value }}
+      {%- endif %}
+  with_dict: "{{ pgrs_recovery_settings }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Start Postgres service
+  service:
+    name: "{{ pgrs_service }}"
+    state: started

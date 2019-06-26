@@ -1,0 +1,59 @@
+user  root;
+worker_processes  1;
+
+load_module "modules/ngx_http_image_filter_module.so";
+
+error_log  /var/log/nginx/error.log info;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+    sendfile        on;
+    #tcp_nopush     on;
+    keepalive_timeout  65;
+    #gzip  on;
+
+
+server {
+        listen   80 default;
+ 
+        root {{ app_dir }};
+        index index.php ;
+ 
+        location / {
+                try_files $uri $uri/ /index.php;
+        }
+ 
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+              root /usr/share/nginx/www;
+        }
+
+ 
+       location ~ .php$ {
+               try_files $uri =404;
+               fastcgi_buffers 16 16k;
+               fastcgi_buffer_size 32k;
+               fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+               fastcgi_index index.php;
+               fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+               include fastcgi_params;
+       }
+
+    location ~* ^.+\.(ico|gif|jpg|jpeg|png|bmp|css)$ {
+                error_page 404 /img/no_ava.jpg;
+    }
+}
+}

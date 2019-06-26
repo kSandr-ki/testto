@@ -1,0 +1,8 @@
+---
+galaxy_info:
+  role_name: devgateway.vendor-postgres
+  description: Install Postgres from community YUM repos
+  author: Development Gateway
+  company: Development Gateway
+  license: GPLv3+
+  dependencies: []

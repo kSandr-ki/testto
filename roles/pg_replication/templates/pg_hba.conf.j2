@@ -1,0 +1,14 @@
+{%  macro table_row(acl_type, database, name, addr, method) %}
+{%    filter replace('\n', '') %}
+{{      '{:9s}'.format(acl_type) }}
+{{      '{:16s}'.format(database) }}
+{{      '{:16s}'.format(name) }}
+{{      '{:30s}'.format(addr) }}
+{{      '{:8s}'.format(method) }}
+{%    endfilter %}
+{%  endmacro -%}
+
+{{  table_row('# Type', 'Database', 'User', 'Address', 'Method') }}
+{%  for acl in (pgrs_hba_defaults + [pgrs_user]) %}
+{{    table_row(acl.type, acl.database, acl.name, (acl.address | default('')), acl.method) }}
+{%  endfor %}

@@ -1,0 +1,5 @@
+---
+
+pgrs_version: 11
+pg_version: "{{ pgrs_version }}"
+pgrs_config: /etc/postgresql/{{ pgrs_version }}/main/postgresql.conf

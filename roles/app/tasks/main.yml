@@ -1,0 +1,32 @@
+---
+
+- name: Install  packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - nginx
+    - php7.0-pgsql
+    - php
+    - php-fpm
+    - sendmail
+    - rsync
+
+- name: Configure nginx
+  template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/nginx.conf"
+  notify:
+    - restart nginx
+
+- name: synchronize app
+  synchronize:
+    mode: push
+    src:  app/
+    dest: "{{ app_dir }}/"
+
+- name: Configure db_connection
+  template:
+    src: db.php.j2
+    dest: "{{ app_dir }}/db.php"

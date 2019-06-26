@@ -1,0 +1,37 @@
+---
+# tasks file for roles/pg_user
+
+
+- name : Create postgres database
+  postgresql_db:
+    name: "{{ pg_db }}"
+    state: present
+  become: true
+  become_user: postgres
+
+- name: Create postgres user
+  postgresql_user:
+    db: "{{ pg_db }}"
+    name: "{{ pg_user.name }}"
+    password: "{{ pg_user.password }}"
+    priv: "ALL"
+  become: true
+  become_user: postgres
+
+- name: Copy sql
+  copy:
+    src: app.sql
+    dest: /tmp/app.sql
+  become: true
+  become_user: postgres
+
+- name: Init app database
+  postgresql_db:
+    name: "{{ pg_db }}"
+#    maintanance_db: "{{ pg_db }}"
+    login_user: "{{ pg_user.name }}"
+    login_password: "{{ pg_user.password }}"
+    state: restore
+    target: /tmp/app.sql
+  become: true
+  become_user: postgres

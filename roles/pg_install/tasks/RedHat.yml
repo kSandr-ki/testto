@@ -1,0 +1,42 @@
+---
+- name: Detect RedHat flavor
+  set_fact:
+    pg_shortver: "{{ pg_version | replace('.', '') }}"
+    rh_family: "{% if ansible_distribution == 'Fedora' %}fedora{% else %}redhat{% endif %}"
+    rh_flavor: "{% if ansible_distribution == 'Fedora' %}fedora{% else %}rhel{% endif %}"
+    rh_suffix: "{% if ansible_distribution == 'Scientific' %}sl{% else %}{{ ansible_distribution | lower }}{% endif %}"
+
+- name: Install YUM utils
+  package:
+    name: yum-utils
+
+- name: Check PGDG release
+  yum:
+    list: "pgdg-{{ rh_suffix }}{{ pg_shortver }}"
+  register: rh_release
+
+- name: Configure temporary YUM repo
+  yum_repository:
+    enabled: false
+    name: pgdg-ansible
+    description: Temporary repository installed by Ansible
+    baseurl: https://download.postgresql.org/pub/repos/yum/{{ pg_version }}/{{ rh_family }}/{{ rh_flavor }}-$releasever-$basearch
+  when: not (rh_release.results | selectattr('yumstate', 'match', 'installed') | list)
+  notify: Cleanup temporary YUM repo
+
+- name: Install PGDG release
+  yum:
+    disablerepo: "*"
+    enablerepo: pgdg-ansible
+    name: "pgdg-{{ rh_suffix }}{{ pg_shortver }}"
+    disable_gpg_check: true
+  when: not (rh_release.results | selectattr('yumstate', 'match', 'installed') | list)
+  ignore_errors: "{{ ansible_check_mode }}"
+  notify: Cleanup temporary YUM repo
+
+- name: Install Postgres packages
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - postgresql{{ pg_shortver }}
+    - postgresql{{ pg_shortver }}-server

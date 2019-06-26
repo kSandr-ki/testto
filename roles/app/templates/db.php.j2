@@ -1,0 +1,11 @@
+<?php
+function openConn(){
+    return  pg_connect("host={{ pg_host }} dbname={{ pg_db }} user={{ pg_user.name }} password={{ pg_user.password }}");
+}
+
+function closeConn($conn){
+   pg_close($conn);
+}
+
+?>
+

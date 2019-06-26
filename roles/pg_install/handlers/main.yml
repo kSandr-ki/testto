@@ -1,0 +1,5 @@
+---
+- name: Cleanup temporary YUM repo
+  yum_repository:
+    name: pgdg-ansible
+    state: absent

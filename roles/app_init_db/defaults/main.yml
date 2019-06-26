@@ -1,0 +1,10 @@
+---
+# defaults file for roles/pg_user
+pg_db: app
+pg_user:
+  type: host
+  name: app
+  database: app
+  address: 0.0.0.0/0
+  method: md5
+  password: toor

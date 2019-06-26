@@ -1,0 +1,15 @@
+---
+# defaults file for app
+
+app_dir: /var/www/html
+
+pg_host: localhost
+
+pg_db: app
+pg_user:
+  type: host
+  name: app
+  database: app
+  address: 0.0.0.0/0
+  method: md5
+  password: toor

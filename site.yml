@@ -1,0 +1,10 @@
+- hosts: all
+  become: yes
+  become_user: root
+  gather_facts: yes
+  roles:
+    - { role: pg_install,       tags: ['pg_install']}
+    - { role: pg_replication,   tags: ['pg_replication','postgres']}
+    - { role: app_init_db,      tags: ['app_init_db']}
+    - { role: app,              tags: ['app']}
+
