@@ -56,6 +56,11 @@ Flight::route('GET|POST /info', function(){
 Flight::route('GET|POST /', function(){
     $number = Flight::request()->query['n'];
     if (isset($number)) {
+     if ( (int)$number > 30 ) { 
+       $response = array('status:'=>'error', 'text'=>'too big number pelase use number less 30');
+       Flight::json($response,400);
+       return;
+     }
       //$number=$_GET['n'];
         for ($counter = 0; $counter < $number; $counter++){   
             echo Fibonacci($counter),' '; 
